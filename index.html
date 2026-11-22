@@ -2,24 +2,84 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Camp Oyo Staff &amp; Alumni Association</title>
 <link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2F5D46">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Camp Oyo">
 <style>
   html, body { margin: 0; height: 100%; background: #F2F5F2; }
   iframe { display: block; border: 0; width: 100%; height: 100%; }
+  .hidden { display: none !important; }
+
+  /* Saved copy for when there's no signal */
+  #offline { --ink:#1D2621; --muted:#46534B; --line:#D5DCD6; --paper:#fff; --wash:#F2F5F2; --pine:#2F5D46; --lake:#245E86;
+    position: fixed; inset: 0; overflow: auto; background: var(--wash); color: var(--ink);
+    font: 18px/1.5 "Atkinson Hyperlegible", Verdana, sans-serif; -webkit-text-size-adjust: 100%; }
+  #offline * { box-sizing: border-box; }
+  #offline header { position: sticky; top: 0; z-index: 2; background: var(--pine); color: #fff; display: flex; align-items: center; gap: 12px;
+    padding: calc(10px + env(safe-area-inset-top)) 16px 10px; }
+  #offline header img { width: 40px; height: 40px; border-radius: 50%; background: #fff; padding: 3px; }
+  #offline header h1 { margin: 0; font-size: 19px; line-height: 1.2; }
+  #offline main { max-width: 760px; margin: 0 auto; padding: 16px 16px 60px; }
+  .ob-note { background: #FFF3B0; border: 1px solid #E5D27A; border-radius: 12px; padding: 14px 16px; margin: 0 0 16px; }
+  .ob-note p { margin: 0 0 10px; }
+  .ob-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 10px 20px; border-radius: 10px;
+    border: 2px solid var(--line); background: var(--paper); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; text-decoration: none; }
+  .ob-btn.primary { background: var(--pine); border-color: var(--pine); color: #fff; }
+  .ob-search label { display: block; font-weight: 700; font-size: 19px; margin: 0 0 6px; }
+  .ob-search input { width: 100%; min-height: 56px; font: inherit; font-size: 20px; padding: 10px 14px; border: 2px solid var(--line); border-radius: 10px; background: #fff; }
+  .ob-search input:focus { outline: none; border-color: var(--pine); }
+  .ob-count { color: var(--muted); text-align: right; margin: 10px 2px 8px; font-size: 16px; }
+  .ob-list { list-style: none; margin: 0; padding: 0; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .ob-list li + li { border-top: 1px solid var(--line); }
+  .ob-list button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 14px 16px; font: inherit; color: inherit; cursor: pointer; }
+  .ob-list button:hover, .ob-list button:focus-visible { background: #F7FAF7; outline: none; }
+  .ob-name { font-weight: 700; font-size: 19px; }
+  .ob-sub { color: var(--muted); font-size: 16px; }
+  .ob-gone .ob-name { color: var(--muted); }
+  .ob-card { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 12px; margin: 0 0 14px; }
+  .ob-card h3 { margin: 0 0 10px; font-size: 17px; color: var(--pine); }
+  .ob-card dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0 0 6px; }
+  .ob-card dt { color: var(--muted); }
+  .ob-card dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+  .ob-card a { color: var(--lake); }
+  .ob-person h2 { font-size: 26px; margin: 14px 0 12px; }
+  .ob-pays { list-style: none; margin: 0; padding: 0; }
+  .ob-pays li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .ob-pays li:first-child { border-top: 0; }
+  .ob-amt { font-weight: 700; white-space: nowrap; }
+  .ob-notes { white-space: pre-wrap; margin: 0 0 8px; }
+  .ob-top { position: sticky; top: 0; z-index: 2; }
+  .ob-top header { position: static; }
+  .ob-status { display: flex; align-items: center; gap: 10px; background: #5B4A12; color: #fff; font-weight: 700; font-size: 18px; padding: 10px 16px; }
+  .ob-dot { width: 12px; height: 12px; border-radius: 50%; background: #F2C94C; flex: none; }
+  .ob-tip { background: var(--paper); border: 2px dashed var(--line); border-radius: 12px; padding: 14px 16px; color: var(--muted); }
+  .ob-bar { position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+    background: #5B4A12; color: #fff; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    font: 700 18px/1.4 "Atkinson Hyperlegible", Verdana, sans-serif; box-shadow: 0 -4px 16px rgba(20,30,25,.2); }
+  .ob-bar.back { background: #2F5D46; }
+  .ob-bar span { flex: 1 1 260px; }
+  .ob-bar .ob-btn { background: #fff; border-color: #fff; color: #1D2621; }
+  :focus-visible { outline: 3px solid #245E86; outline-offset: 2px; }
 </style>
 </head>
 <body>
 <!--
-  This page shows the Camp Oyo members app (a Google Apps Script web app)
-  on the association's own domain. It holds no member data.
+  This page shows the Camp Oyo members app (a Google Apps Script web app) on the association's own address.
+  It can also be added to a phone's home screen. When the app loads, it hands this page a copy of the roster,
+  which is kept on the device so people can still be looked up when there's no signal (read only).
   If the app ever moves, change APP_URL below and publish again.
 -->
 <iframe id="app" title="Camp Oyo Staff &amp; Alumni Association" allow="clipboard-write"></iframe>
+<div id="offline" class="hidden" role="main"></div>
 <script>
   var APP_URL = 'https://script.google.com/macros/s/AKfycbwIzb07rS8xz1rx29wkI-1YdsrKSg9V0TLkCiN3b-vvUy39mXpL_A9KbIYl5A_ct9k/exec';
+  var SAVED = 'cosaa_offline_copy';
+
   // Pass the address's settings (sign-in link, filters) along to the app.
   document.getElementById('app').src = APP_URL + window.location.search;
   // Remove the one-time sign-in code from the address bar, keep any filters.
@@ -29,15 +89,150 @@
     var rest = params.toString();
     history.replaceState(null, '', window.location.pathname + (rest ? '?' + rest : ''));
   }
-  // The app reports its current filters so this address can be bookmarked or shared.
+
+  // Messages from the app: its current filters (for bookmarking) and a copy of the roster to keep for offline use.
   window.addEventListener('message', function (e) {
     var host = '';
     try { host = new URL(e.origin).hostname; } catch (err) { return; }
     if (!/\.googleusercontent\.com$/.test(host)) return;
     var d = e.data;
-    if (!d || d.type !== 'oyo-filters' || typeof d.qs !== 'string') return;
-    history.replaceState(null, '', window.location.pathname + (d.qs ? '?' + d.qs : ''));
+    if (!d || typeof d !== 'object') return;
+    if (d.type === 'oyo-filters' && typeof d.qs === 'string') {
+      history.replaceState(null, '', window.location.pathname + (d.qs ? '?' + d.qs : ''));
+    } else if (d.type === 'oyo-snapshot' && Array.isArray(d.members) && Array.isArray(d.payments)) {
+      try { localStorage.setItem(SAVED, JSON.stringify({ at: String(d.at || ''), members: d.members, payments: d.payments })); } catch (err) {}
+    } else if (d.type === 'oyo-snapshot-clear') {
+      try { localStorage.removeItem(SAVED); } catch (err) {}
+    }
   });
+
+  // Let the page work as an app on the home screen, and open even with no signal.
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+
+  // ---------- The saved copy, shown when there's no signal ----------
+  var box = document.getElementById('offline');
+  var data = null, query = '';
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function loadSaved() { try { return JSON.parse(localStorage.getItem(SAVED) || 'null'); } catch (e) { return null; } }
+  function niceDate(d) {
+    if (!d) return '';
+    var s = String(d).replace('~', ''), p = s.split('-'), M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var out = p.length === 3 ? M[+p[1] - 1] + ' ' + (+p[2]) + ', ' + p[0] : p.length === 2 ? M[+p[1] - 1] + ' ' + p[0] : s;
+    return (String(d).charAt(0) === '~' ? 'About ' : '') + out;
+  }
+  function savedWhen(iso) {
+    var t = new Date(iso); if (isNaN(t)) return 'an earlier visit';
+    return t.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + ' at ' + t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+  function money(v) { var n = parseFloat(String(v).replace(/[^0-9.]/g, '')); return isNaN(n) ? '' : '$' + (n % 1 ? n.toFixed(2) : n.toLocaleString()); }
+  function fullName(m) { return ((m['First Name'] || '') + ' ' + (m['Last Name'] || '')).trim(); }
+  function gone(m) { return m.Active === 'Deceased' || /^(deceased|crossed out|likely deceased)/i.test(m.Notes || ''); }
+  function town(m) { return [m.City, m.State].filter(Boolean).join(', '); }
+
+  function shell(inner) {
+    return '<div class="ob-top"><header><img src="favicon.png" alt=""><h1>Camp Oyo Staff &amp; Alumni Association</h1></header>' +
+      '<div class="ob-status" role="status"><span class="ob-dot" aria-hidden="true"></span>Offline. Look up only, no changes.</div></div><main>' + inner + '</main>';
+  }
+  function note() {
+    return '<div class="ob-note"><p><strong>You\'re offline, so this is look-up only.</strong> You can find people and see their details and payments, ' +
+      'but you can\'t make changes until you have signal again.</p><p>This copy was saved on this device on ' + esc(savedWhen(data.at)) + '.</p>' +
+      '<button type="button" class="ob-btn" data-retry>Check for signal</button><p class="ob-sub" data-retrymsg role="status" style="margin:10px 0 0"></p></div>';
+  }
+  function showList() {
+    box.innerHTML = shell(note() +
+      '<div class="ob-search"><label for="obq">Find a person</label><input id="obq" type="search" placeholder="Type a name, a town, or Troop 43" autocomplete="off"></div>' +
+      '<p class="ob-count" id="obcount"></p><ul class="ob-list" id="oblist"></ul>');
+    var q = document.getElementById('obq'); q.value = query;
+    q.addEventListener('input', function () { query = q.value; fillList(); });
+    fillList();
+    wireRetry();
+  }
+  function fillList() {
+    var words = query.toLowerCase().split(/\s+/).filter(Boolean);
+    var list = data.members.filter(function (m) {
+      var hay = [fullName(m), m.City, m.State, m.Email, m.Phone, m.ID, m.Troop ? 'troop ' + m.Troop : '', m.Member].join(' ').toLowerCase();
+      return words.every(function (w) { return hay.indexOf(w) >= 0; });
+    }).sort(function (a, b) { return ((a['Last Name'] || '') + ' ' + (a['First Name'] || '')).localeCompare((b['Last Name'] || '') + ' ' + (b['First Name'] || '')); });
+    document.getElementById('obcount').textContent = 'Showing ' + list.length + (list.length === data.members.length ? '' : ' of ' + data.members.length) + ' people';
+    document.getElementById('oblist').innerHTML = list.slice(0, 400).map(function (m) {
+      var sub = [town(m), m.Member, gone(m) ? (m.Active === 'Deceased' ? 'Deceased' : 'Crossed out') : ''].filter(Boolean).join(', ');
+      return '<li class="' + (gone(m) ? 'ob-gone' : '') + '"><button type="button" data-id="' + esc(m.ID || '') + '" data-name="' + esc(fullName(m)) + '"><div class="ob-name">' + esc(fullName(m) || 'No name') + '</div>' +
+        (sub ? '<div class="ob-sub">' + esc(sub) + '</div>' : '') + '</button></li>';
+    }).join('');
+    document.querySelectorAll('#oblist button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var m = data.members.filter(function (x) { return b.dataset.id ? x.ID === b.dataset.id : fullName(x) === b.dataset.name; })[0];
+        if (m) showPerson(m);
+      });
+    });
+  }
+  function row(label, val) { return val ? '<dt>' + esc(label) + '</dt><dd>' + val + '</dd>' : ''; }
+  function showPerson(m) {
+    var addr = [m.Street, [m.City, [m.State, m.Zip].filter(Boolean).join(' ')].filter(Boolean).join(', ')].filter(Boolean).map(esc).join('<br>');
+    var pays = m.ID ? data.payments.filter(function (p) { return p['Member ID'] === m.ID; }).sort(function (a, b) { return String(b.Date || '').replace('~', '').localeCompare(String(a.Date || '').replace('~', '')); }) : [];
+    var what = function (p) { return p.Type === 'Purchase' ? 'Bought ' + (p.Item || 'an item') : p.Type === 'Donation' ? 'Donation' : (p.Membership ? p.Membership + ' dues' : 'Dues'); };
+    box.innerHTML = shell(note() +
+      '<button type="button" class="ob-btn" data-back>Back to everyone</button>' +
+      '<div class="ob-person"><h2>' + esc(fullName(m)) + '</h2>' +
+      '<div class="ob-card"><h3>Contact</h3><dl>' +
+        row('Address', addr) +
+        row('Phone', m.Phone ? '<a href="tel:' + esc(String(m.Phone).replace(/[^0-9+]/g, '')) + '">' + esc(m.Phone) + '</a>' : '') +
+        row('Email', m.Email ? '<a href="mailto:' + esc(m.Email) + '">' + esc(m.Email) + '</a>' : '') +
+      '</dl>' + (addr || m.Phone || m.Email ? '' : '<p class="ob-sub">No contact details on file.</p>') + '</div>' +
+      '<div class="ob-card"><h3>Membership</h3><dl>' +
+        row('Membership', esc(m.Member || 'Not set')) + row('Status', esc(m.Active)) + row('Joined', esc(niceDate(m.Joined))) +
+        row('Troop', esc(m.Troop)) + row('Member ID', esc(String(m.ID || '').toUpperCase())) +
+      '</dl></div>' +
+      (m.Notes ? '<div class="ob-card"><h3>Notes</h3><p class="ob-notes">' + esc(m.Notes) + '</p></div>' : '') +
+      '<div class="ob-card"><h3>Payments</h3>' + (pays.length ? '<ul class="ob-pays">' + pays.map(function (p) {
+        return '<li><div><strong>' + esc(what(p)) + '</strong><div class="ob-sub">' + esc([niceDate(p.Date) || 'Date unknown', p.Method, p.Reference ? '#' + p.Reference : ''].filter(Boolean).join(', ')) + '</div>' +
+          (p.Note ? '<div class="ob-sub">' + esc(p.Note) + '</div>' : '') + '</div><div class="ob-amt">' + esc(money(p.Amount)) + '</div></li>';
+      }).join('') + '</ul>' : '<p class="ob-sub">No payments on record.</p>') + '</div>' +
+      '<p class="ob-tip">Need to change something? Jot it down for now, and update it in the app once you have signal.</p></div>');
+    box.querySelector('[data-back]').addEventListener('click', showList);
+    wireRetry();
+    box.scrollTop = 0;
+  }
+  // Checks for a connection first. With signal, the full app opens. Without it, he stays on his saved copy and is told so.
+  function wireRetry() {
+    var r = box.querySelector('[data-retry]'), msg = box.querySelector('[data-retrymsg]');
+    if (!r) return;
+    r.addEventListener('click', function () {
+      r.disabled = true; r.textContent = 'Checking\u2026'; if (msg) msg.textContent = '';
+      var check = navigator.onLine ? reachApp() : Promise.reject();
+      check.then(function () {
+        r.textContent = 'Signal found. Opening the app\u2026';
+        window.location.reload();
+      }, function () {
+        r.disabled = false; r.textContent = 'Check for signal';
+        if (msg) msg.textContent = 'Still no signal. Your saved copy is still here, so you can keep looking people up.';
+      });
+    });
+  }
+
+  function showOffline() {
+    data = loadSaved();
+    box.classList.remove('hidden');
+    if (!data || !data.members || !data.members.length) {
+      box.innerHTML = shell('<div class="ob-note"><p><strong>You\'re offline,</strong> and there\'s no saved copy on this device yet, so there\'s nothing to look up.</p>' +
+        '<p>Open the app once while you have a connection and sign in. It saves a copy automatically, so next time you can look people up without signal.</p>' +
+        '<button type="button" class="ob-btn" data-retry>Check for signal</button><p class="ob-sub" data-retrymsg role="status" style="margin:10px 0 0"></p></div>');
+      wireRetry();
+      return;
+    }
+    showList();
+  }
+
+  // Decide whether we can reach the app. No signal at all, or no answer within 8 seconds, shows the saved copy.
+  function reachApp() {
+    return new Promise(function (ok, no) {
+      var timer = setTimeout(no, 8000);
+      fetch(APP_URL + '?ping=' + Date.now(), { mode: 'no-cors', cache: 'no-store' }).then(function () { clearTimeout(timer); ok(); }, function () { clearTimeout(timer); no(); });
+    });
+  }
+  if (!navigator.onLine) showOffline();
+  else reachApp().catch(showOffline);
+  // If signal drops while the app is open, the app itself turns changes off and says why.
 </script>
 </body>
 </html>
